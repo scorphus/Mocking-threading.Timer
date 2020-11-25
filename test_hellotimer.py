@@ -32,8 +32,8 @@ def patch_hellotimer_timer(f):
 
 def patch_threading_timer(target_timer):
     """patch_threading_timer acts similarly to unittest.mock.patch as a
-    function decorator, but specific for threading.Timer. The function passed to
-    threading.Timer is called right away with all given arguments.
+    function decorator, but specifically for threading.Timer. The function
+    passed to threading.Timer is called right away with all given arguments.
 
     :arg str target_timer: the target Timer (threading.Timer) to be patched
     """
@@ -44,16 +44,15 @@ def patch_threading_timer(target_timer):
             def side_effect(interval, function, args=None, kwargs=None):
                 args = args if args is not None else []
                 kwargs = kwargs if kwargs is not None else {}
-                # Call whatever is called when interval is reached
+                # Call whatever would be called when interval is reached
                 function(*args, **kwargs)
-                # Return a mock object to allow function calls on whatever is
-                # returned by Timer
+                # Return a mock object to allow function calls on the
+                # returned value
                 return Mock()
 
-            # Mock target_timer in a context, redefine both its behavior and
-            # return value
             with patch(target_timer, side_effect=side_effect) as timer_mock:
-                # Pass the mock object to the decorated function
+                # Pass the mock object to the decorated function for further
+                # assertions
                 return f(*(*args, timer_mock), **kwargs)
 
         return wrapper
