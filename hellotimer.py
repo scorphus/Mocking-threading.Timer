@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This file is part of https://github.com/scorphus/Mocking-threading.Timer
+# This file is part of pabloaguiar.me/post/karen-on-python-mocks-threading-timer
 
 # Licensed under the BSD-3-Clause license:
 # https://opensource.org/licenses/BSD-3-Clause
