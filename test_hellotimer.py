@@ -61,14 +61,17 @@ def patch_threading_timer(target_timer):
 
 
 class HellotimerTestCase(unittest.TestCase):
-    @patch("hellotimer.hello")
-    def test_set_timer_with_sleep(self, hello_mock):
+    def setUp(self):
+        hello_patcher = patch("hellotimer.hello")
+        self.hello_mock = hello_patcher.start()
+        self.addCleanup(hello_patcher.stop)
+
+    def test_set_timer_with_sleep(self):
         hellotimer.set_timer("Neo")
         time.sleep(1)
-        hello_mock.assert_called_once_with("Neo")
+        self.hello_mock.assert_called_once_with("Neo")
 
-    @patch("hellotimer.hello")
-    def test_set_timer_with_patch(self, hello_mock):
+    def test_set_timer_with_patch(self):
         def side_effect(interval, function, args=None, kwargs=None):
             args = args if args is not None else []
             kwargs = kwargs if kwargs is not None else {}
@@ -77,19 +80,17 @@ class HellotimerTestCase(unittest.TestCase):
 
         with patch("hellotimer.Timer", side_effect=side_effect) as timer_mock:
             hellotimer.set_timer("Neo")
+            self.hello_mock.assert_called_once_with("Neo")
             timer_mock.assert_called_once_with(1.0, hellotimer.hello, ["Neo"])
-            hello_mock.assert_called_once_with("Neo")
 
     @patch_hellotimer_timer
-    @patch("hellotimer.hello")
-    def test_set_timer_with_decorator_intermediate(self, timer_mock, hello_mock):
+    def test_set_timer_with_decorator_intermediate(self, timer_mock):
         hellotimer.set_timer("Neo")
+        self.hello_mock.assert_called_once_with("Neo")
         timer_mock.assert_called_once_with(1.0, hellotimer.hello, ["Neo"])
-        hello_mock.assert_called_once_with("Neo")
 
     @patch_threading_timer("hellotimer.Timer")
-    @patch("hellotimer.hello")
-    def test_set_timer_with_decorator_final(self, timer_mock, hello_mock):
+    def test_set_timer_with_decorator_final(self, timer_mock):
         hellotimer.set_timer("Neo")
+        self.hello_mock.assert_called_once_with("Neo")
         timer_mock.assert_called_once_with(1.0, hellotimer.hello, ["Neo"])
-        hello_mock.assert_called_once_with("Neo")
